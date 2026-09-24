@@ -257,11 +257,11 @@ function suggest(){
   if (q) list = list.filter(x => norm(x.c.n).indexOf(q) >= 0 || norm(x.c.s).indexOf(q) >= 0);
   else list = list.filter(x => x.onRoute);
   list.sort((a,b) => (a.done - b.done) || (b.onRoute - a.onRoute) || (route.indexOf(a.c.n) - route.indexOf(b.c.n)));
-  const box = $('sugg');
+  const box = $('sugg'), nextN = route.find(n => TODAY.done.indexOf(n) < 0);
   if (picked && !q) { box.innerHTML = ''; return; }
   box.innerHTML = list.slice(0, 30).map((x,i) => `<button type="button" data-i="${CFG.customers.indexOf(x.c)}" class="${x.done ? 'done' : ''}">
-    <span>${esc(x.c.s || x.c.n)}${x.c.s ? `<br><small style="color:var(--muted)">${esc(x.c.n)}</small>` : ''}</span>
-    <span class="tag">${x.done ? 'done' : x.onRoute ? 'on route' : ''}</span></button>`).join('')
+    <span>${esc(x.c.s || x.c.n)}${x.c.s ? `<br><small style="color:var(--muted)">${esc(x.c.n)}</small>` : ''}${x.onRoute && x.c.dl && !x.done ? `<br><small style="color:var(--muted)">by ${esc(x.c.dl)}</small>` : ''}</span>
+    <span class="tag"${x.c.n === nextN && !q ? ' style="background:var(--leaf);color:#fff"' : ''}>${x.done ? 'done' : x.onRoute ? (x.c.n === nextN ? 'NEXT - stop ' : 'stop ') + (route.indexOf(x.c.n) + 1) : ''}</span></button>`).join('')
     + (q ? `<button type="button" data-new="1"><span>Not in list: use "${esc($('search').value)}"</span><span class="tag">new</span></button>` : '')
     + (!q && !list.length ? '<div style="padding:10px 12px;color:var(--muted)">Type to search all customers.</div>' : '');
   box.querySelectorAll('button').forEach(b => b.onclick = () => pick(b.dataset.new ? { n: $('search').value.trim(), a:'', w:'', dl:'', nt:'', b:0, isNew:true } : CFG.customers[+b.dataset.i]));
@@ -270,7 +270,9 @@ function pick(c){
   picked = c; $('search').value = ''; $('sugg').innerHTML = '';
   const card = $('custCard'); card.classList.remove('hide');
   const done = TODAY.done.indexOf(c.n) >= 0;
+  const pc = String(c.a || '').match(/\b(\d{6})\b/), mq = pc ? 'Singapore ' + pc[1] : (c.a || '') + ' Singapore';
   card.innerHTML = `<div class="nm">${esc(c.s || c.n)}</div><div class="ad">${esc(c.a || '')}</div>`
+    + (c.a ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mq)}" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0;padding:8px 14px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:700;text-decoration:none">Open in Google Maps</a>` : '')
     + (c.w || c.dl ? `<div class="note info">Delivery: ${esc(c.w || '')}${c.dl ? ' (deadline ' + esc(c.dl) + ')' : ''}</div>` : '')
     + (c.nt ? `<div class="note info">${esc(c.nt)}</div>` : '')
     + (c.b > 0 ? `<div class="note warn">Customer is holding ${c.b} basket${c.b > 1 ? 's' : ''} - collect back</div>` : '')
