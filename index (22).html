@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F4D3A">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FSP SG">
+<title>FSP SG Delivery</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== PASTE YOUR WEB APP URL IN THE SCRIPT BELOW (const API) ===== */
+  :root{--leaf:#1F4D3A;--leaf-2:#2E6B51;--crate:#F2B705;--paper:#F7F8F4;--ink:#18201C;--line:#CFD6CF;--muted:#5E6B63;--bad:#B3261E;--badbg:#FBE3E1;--warnbg:#FFF2CC;--okbg:#E4EFE8}
+  *{box-sizing:border-box}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Barlow,system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom,0px)}
+  header{background:var(--leaf);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px}
+  .top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+  h1{margin:0;font:700 20px/1.1 "Barlow Semi Condensed",sans-serif}
+  .clock{font:600 36px/1 "Barlow Semi Condensed",sans-serif}
+  .sub{color:#CFE3D8;font-size:13px;margin-top:4px}
+  .pill{display:inline-block;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.15);margin-right:6px}
+  .pill.warn{background:var(--crate);color:var(--ink)}
+  main{max-width:560px;margin:0 auto;padding:4px 16px 150px}
+  section{padding:14px 0;border-bottom:1px solid var(--line)}
+  h2{font:600 18px/1.2 "Barlow Semi Condensed",sans-serif;margin:0 0 8px;color:var(--leaf)}
+  label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}
+  label small{font-weight:400;color:var(--muted)}
+  input,select,textarea{width:100%;font:inherit;padding:12px;border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  select{font-weight:600;appearance:none;-webkit-appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%231F4D3A' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right 12px center}
+  input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--crate);outline-offset:1px;border-color:var(--leaf)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .seg{display:grid;gap:6px}
+  .seg.c2{grid-template-columns:1fr 1fr}.seg.c3{grid-template-columns:repeat(3,1fr)}.seg.c5{grid-template-columns:repeat(5,1fr)}
+  .seg input{display:none}
+  .seg label{margin:0;text-align:center;padding:12px 2px;border:1.5px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;font:700 15px/1.1 "Barlow Semi Condensed",sans-serif}
+  .seg input:checked+label{background:var(--leaf);border-color:var(--leaf);color:#fff}
+  .seg.yn input[value=No]:checked+label{background:var(--bad);border-color:var(--bad)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+  .stat b{display:block;font:700 24px/1.1 "Barlow Semi Condensed",sans-serif;color:var(--leaf)}
+  .stat span{font-size:12px;color:var(--muted)}
+  .sugg{border:1.5px solid var(--line);border-radius:8px;background:#fff;margin-top:4px;max-height:320px;overflow:auto}
+  .sugg:empty{display:none}
+  .sugg button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;padding:11px 12px;border:0;border-bottom:1px solid #E6EAE5;background:none;font:inherit;cursor:pointer}
+  .sugg button:last-child{border-bottom:0}
+  .sugg .tag{font-size:12px;padding:1px 6px;border-radius:99px;background:var(--okbg);color:var(--leaf);white-space:nowrap}
+  .sugg .done{opacity:.45}
+  .card{background:#fff;border:1.5px solid var(--leaf);border-radius:10px;padding:12px;margin-top:8px}
+  .card .nm{font:700 20px/1.15 "Barlow Semi Condensed",sans-serif}
+  .card .ad{color:var(--muted);font-size:14px}
+  .note{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:14px;font-weight:600}
+  .note.info{background:var(--okbg);color:var(--leaf)}.note.warn{background:var(--warnbg)}.note.bad{background:var(--badbg);color:var(--bad)}
+  .shots{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .shot{position:relative;display:flex;align-items:center;justify-content:center;min-height:130px;border:2px dashed var(--crate);border-radius:10px;background:#fff;color:var(--leaf);font-weight:600;overflow:hidden;text-align:center;padding:6px}
+  .shot.opt{border-color:var(--leaf-2)}
+  .shot img{width:100%;display:block;border-radius:6px}
+  .shot input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .shot small{display:block;font-weight:400;color:var(--muted)}
+  .step{display:grid;grid-template-columns:52px 1fr 52px;gap:6px}
+  .step button{border:1.5px solid var(--leaf);background:#fff;color:var(--leaf);border-radius:8px;font:700 24px/1 "Barlow Semi Condensed";cursor:pointer}
+  .step input{text-align:center;font:700 22px "Barlow Semi Condensed";padding:8px 4px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips input{display:none}
+  .chips label{margin:0;padding:10px 12px;border:1.5px solid var(--line);border-radius:99px;background:#fff;cursor:pointer;font-weight:600}
+  .chips input:checked+label{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+  .btn{display:block;width:100%;max-width:560px;margin:0 auto;border:0;border-radius:10px;padding:15px;font:700 18px "Barlow Semi Condensed",sans-serif;cursor:pointer;background:var(--crate);color:var(--ink)}
+  .btn:disabled{opacity:.5}
+  .msg{max-width:560px;margin:0 auto 6px;font-weight:600;font-size:15px}
+  .msg.err{color:var(--bad)}.msg.ok{color:var(--leaf)}
+  .hcard{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}
+  .hc-sm{font-size:14px;color:var(--muted)}
+  .hc-big{font:700 28px/1.1 "Barlow Semi Condensed",sans-serif;color:var(--ink)}
+  .hc-mid{font:700 21px/1.1 "Barlow Semi Condensed",sans-serif;color:var(--ink);white-space:nowrap}
+  .hc-r{text-align:right}
+  .kick{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+  .kick svg{flex:none}
+  .when{display:flex;align-items:center;gap:6px;font-size:15px;color:var(--muted);margin-top:2px}
+  .when.late{color:var(--bad);font-weight:700}
+  .note.blue{background:#DCEBFA;color:#1F4E8C;font-weight:500}
+  .note.warn{color:#6B4E00}
+  .gpsl{margin-top:12px}.gpsl.far{color:var(--bad);font-weight:700}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div><h1>FSP SG delivery</h1><div class="sub" id="today"></div></div>
+    <div class="clock" id="clock">--:--</div>
+  </div>
+  <div class="sub" style="margin-top:8px"><span class="pill" id="gps">GPS ...</span><span class="pill hide" id="queue"></span><span class="pill" id="net"></span></div>
+</header>
+
+<main>
+  <section id="statsSec" class="hide" style="border-bottom:0;padding-bottom:0">
+    <div class="hcard">
+      <div><div class="hc-sm" id="hTruck"></div><div class="hc-big" id="hDrop">Drop 1</div></div>
+      <div class="hc-r"><div class="hc-sm">Today</div><div class="hc-mid" id="hToday">0 drops · RM0</div></div>
+    </div>
+  </section>
+  <section>
+    <div class="row">
+      <div><label for="driver">Driver</label><select id="driver"></select></div>
+      <div><label for="truck">Truck</label><select id="truck"></select></div>
+    </div>
+    <label>Trip</label>
+    <div class="seg c2"><input type="radio" name="trip" id="tr1" value="1" checked><label for="tr1">Trip 1</label>
+      <input type="radio" name="trip" id="tr2" value="2"><label for="tr2">Trip 2</label></div>
+  </section>
+
+
+  <section>
+    <div class="seg c5" id="kinds">
+      <input type="radio" name="kind" id="k_start" value="start"><label for="k_start">START</label>
+      <input type="radio" name="kind" id="k_drop" value="drop" checked><label for="k_drop">DROP</label>
+      <input type="radio" name="kind" id="k_ppwc" value="ppwc"><label for="k_ppwc">PPWC</label>
+      <input type="radio" name="kind" id="k_meet" value="meet"><label for="k_meet">MEET</label>
+      <input type="radio" name="kind" id="k_end" value="end"><label for="k_end">END</label>
+    </div>
+  </section>
+
+  <!-- DROP -->
+  <div id="f_drop">
+    <section>
+      <div id="searchWrap"><label for="search">Customer <small>(type a few letters)</small></label>
+      <input id="search" autocomplete="off" placeholder="e.g. chimi, sarnies"></div>
+      <div class="sugg" id="sugg"></div>
+      <div id="custCard" class="card hide"></div>
+    </section>
+    <section>
+      <div class="shots">
+        <div class="shot" data-p="pod"><span class="hint">POD photo<small>required</small></span><img class="hide" alt="POD photo"><input type="file" accept="image/*" capture="environment" aria-label="POD photo"></div>
+        <div class="shot" data-p="inv"><span class="hint">Invoice photo<small>required</small></span><img class="hide" alt="Invoice photo"><input type="file" accept="image/*" capture="environment" aria-label="Invoice photo"></div>
+      </div>
+      <label>Invoice signed?</label>
+      <div class="seg c2 yn"><input type="radio" name="signed" id="sg_y" value="Yes"><label for="sg_y">YES</label>
+        <input type="radio" name="signed" id="sg_n" value="No"><label for="sg_n">NO</label></div>
+      <div id="reasonBox" class="hide"><label for="reason">Why not signed?</label><select id="reason"></select></div>
+    </section>
+    <section>
+      <div class="row">
+        <div><label>Baskets delivered</label><div class="step"><button type="button" data-t="bOut" data-d="-1" aria-label="Less">-</button><input id="bOut" type="number" inputmode="numeric" value="0" min="0"><button type="button" data-t="bOut" data-d="1" aria-label="More">+</button></div></div>
+        <div><label>Baskets collected</label><div class="step"><button type="button" data-t="bIn" data-d="-1" aria-label="Less">-</button><input id="bIn" type="number" inputmode="numeric" value="0" min="0"><button type="button" data-t="bIn" data-d="1" aria-label="More">+</button></div></div>
+      </div>
+      <div class="kick gpsl hide" id="gpsLine"></div>
+    </section>
+  </div>
+
+  <!-- PPWC -->
+  <div id="f_ppwc" class="hide">
+    <section>
+      <h2>Market collection (PPWC)</h2>
+      <label>Collected from</label><div class="chips" id="suppliers"></div>
+      <label>Photo of items collected</label>
+      <div class="shot" data-p="pod2"><span class="hint">Tap to take photo<small>required</small></span><img class="hide" alt="Items photo"><input type="file" accept="image/*" capture="environment" aria-label="Items photo"></div>
+      <div class="note info">After PPWC the trip switches to Trip 2 automatically.</div>
+    </section>
+  </div>
+
+  <!-- MEET -->
+  <div id="f_meet" class="hide">
+    <section>
+      <h2>Meet driver (collect / hand over items)</h2>
+      <label for="met">Driver met</label><select id="met"></select>
+      <label>Photo <small>(optional)</small></label>
+      <div class="shot opt" data-p="pod3"><span class="hint">Tap to take photo<small>optional</small></span><img class="hide" alt="Meet photo"><input type="file" accept="image/*" capture="environment" aria-label="Meet photo"></div>
+      <div class="note info">Counts as 1 drop for you and 1 drop for the driver you met.</div>
+    </section>
+  </div>
+
+  <!-- START -->
+  <div id="f_start" class="hide">
+    <section>
+      <h2>Start delivery</h2>
+      <label for="temp">Temperature before delivery (C)</label>
+      <input id="temp" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 4" style="font:700 26px 'Barlow Semi Condensed';text-align:center">
+      <label>Temperature photo <small>(optional)</small></label>
+      <div class="shot opt" data-p="pod4"><span class="hint">Tap to take photo<small>optional</small></span><img class="hide" alt="Temperature photo"><input type="file" accept="image/*" capture="environment" aria-label="Temperature photo"></div>
+    </section>
+  </div>
+
+  <!-- END -->
+  <div id="f_end" class="hide">
+    <section>
+      <h2>End delivery</h2>
+      <div class="note info" id="endInfo"></div>
+      <label>Total baskets brought back</label>
+      <div class="step"><button type="button" data-t="bBack" data-d="-1" aria-label="Less">-</button><input id="bBack" type="number" inputmode="numeric" value="0" min="0"><button type="button" data-t="bBack" data-d="1" aria-label="More">+</button></div>
+    </section>
+  </div>
+
+  <section>
+    <label for="remarks">Remarks <small>(optional)</small></label>
+    <textarea id="remarks" rows="2"></textarea>
+  </section>
+</main>
+
+<div class="bar">
+  <div class="msg" id="msg"></div>
+  <button class="btn" id="submitBtn">Submit</button>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbz52V2moEi7cRXFAiiXiMJkXmxc3xNt5refLUfQNJp30e2i8L8UEX5iiuuiezq-hrua4g/exec';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const pad = n => String(n).padStart(2,'0');
+const val = n => { const r = document.querySelector('input[name=' + n + ']:checked'); return r ? r.value : ''; };
+const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+const store = { get(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+                set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } } };
+let CFG = store.get('sg_cfg', null), photos = {}, lat = '', lng = '', picked = null, sending = false;
+
+function tick(){ const d = new Date(); $('clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+  $('today').textContent = d.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}); }
+tick(); setInterval(tick, 15000);
+function netPill(){ $('net').textContent = navigator.onLine ? 'Online' : 'Offline'; $('net').className = 'pill' + (navigator.onLine ? '' : ' warn'); }
+window.addEventListener('online', () => { netPill(); flush(); }); window.addEventListener('offline', netPill); netPill();
+
+/* GPS */
+function getLoc(){ return new Promise(res => {
+  if (!navigator.geolocation) { $('gps').textContent = 'No GPS'; return res(); }
+  navigator.geolocation.getCurrentPosition(p => { lat = p.coords.latitude.toFixed(6); lng = p.coords.longitude.toFixed(6); $('gps').textContent = 'GPS ok'; $('gps').className = 'pill'; gpsLine(); res(); },
+    () => { $('gps').textContent = 'GPS off - allow location'; $('gps').className = 'pill warn'; res(); },
+    { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); }); }
+getLoc(); setInterval(getLoc, 60000);
+
+/* Config */
+async function loadCfg(){
+  if (!API || API.indexOf('http') !== 0) { msg('Set the API link in index.html first.', true); return; }
+  try {
+    const r = await fetch(API + '?driver=' + encodeURIComponent($('driver').value || store.get('sg_driver','')));
+    const j = await r.json(); if (!j.ok) throw new Error(j.error);
+    CFG = j; store.set('sg_cfg', j); fill(); if (j.today) showToday(j.today);
+    if (j.routes && j.routes._error) msg('Route list: ' + j.routes._error, true);
+  } catch(e) { if (!CFG) msg('Cannot load data - check signal.', true); else fill(); }
+}
+function opts(arr, ph){ return (ph ? `<option value="">${ph}</option>` : '') + arr.map(x => `<option>${esc(x)}</option>`).join(''); }
+function fill(){
+  const dSel = $('driver').value || store.get('sg_driver',''), tSel = $('truck').value || store.get('sg_truck','');
+  $('driver').innerHTML = opts(CFG.drivers.map(d => d.name), 'Choose'); $('driver').value = dSel;
+  $('truck').innerHTML = opts(CFG.trucks, 'Choose'); $('truck').value = tSel;
+  $('met').innerHTML = opts(CFG.drivers.map(d => d.name).filter(n => n !== dSel), 'Choose driver');
+  $('reason').innerHTML = opts(CFG.reasons, 'Choose reason');
+  $('suppliers').innerHTML = CFG.suppliers.map((s,i) => `<input type="checkbox" id="sp${i}" value="${esc(s)}"><label for="sp${i}">${esc(s)}</label>`).join('');
+  updateHead(); suggest();
+}
+$('driver').onchange = () => { const d = CFG.drivers.find(x => x.name === $('driver').value);
+  if (d && d.truck) $('truck').value = d.truck; store.set('sg_driver', $('driver').value); store.set('sg_truck', $('truck').value); fill(); loadCfg(); };
+$('truck').onchange = () => { store.set('sg_truck', $('truck').value); picked = null; $('custCard').classList.add('hide'); updateHead(); suggest(); };
+const tripSaved = store.get('sg_trip', null);
+if (tripSaved && tripSaved.date === new Date().toDateString()) $('tr' + tripSaved.t).checked = true;
+document.querySelectorAll('input[name=trip]').forEach(r => r.onchange = () => store.set('sg_trip', { date: new Date().toDateString(), t: val('trip') }));
+
+let TODAY = { done: [], drops: 0, amount: 0 };
+function showToday(t){
+  TODAY = t;
+  if (picked && picked.auto && TODAY.done.indexOf(picked.n) >= 0) { picked = null; $('custCard').classList.add('hide'); }
+  updateHead(); suggest();
+}
+function updateHead(){
+  if (!CFG) return;
+  const route = (CFG.routes || {})[$('truck').value] || [], doneOn = route.filter(n => TODAY.done.indexOf(n) >= 0).length;
+  $('statsSec').classList.remove('hide');
+  $('hTruck').textContent = [$('truck').value, $('driver').value].filter(String).join(' · ');
+  $('hDrop').textContent = route.length ? (doneOn >= route.length ? 'All ' + route.length + ' stops done' : 'Drop ' + (doneOn + 1) + ' of ' + route.length)
+    : 'Drop ' + ((TODAY.drops || 0) + 1);
+  $('hToday').textContent = (TODAY.drops || 0) + ' drop' + (TODAY.drops === 1 ? '' : 's') + ' · RM' + Math.round(TODAY.amount || 0);
+}
+const ICO = {
+  find: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  clock: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  pin: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  warn: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></svg>'
+};
+function hmOf(t){ const m = String(t || '').match(/(\d{1,2})[:.](\d{2})/); return m ? +m[1] * 60 + +m[2] : null; }
+function ampm(m){ if (m == null) return ''; const h = Math.floor(m / 60), mm = pad(m % 60); return (h % 12 || 12) + '.' + mm + (h < 12 ? 'am' : 'pm'); }
+let manual = false;
+
+/* Customer search */
+function suggest(){
+  if (!CFG) return;
+  const q = norm($('search').value), route = (CFG.routes || {})[$('truck').value] || [];
+  let list = CFG.customers.map(c => ({ c, onRoute: route.indexOf(c.n) >= 0, done: TODAY.done.indexOf(c.n) >= 0 }));
+  if (q) list = list.filter(x => norm(x.c.n).indexOf(q) >= 0 || norm(x.c.s).indexOf(q) >= 0);
+  else list = list.filter(x => x.onRoute);
+  list.sort((a,b) => (a.done - b.done) || (b.onRoute - a.onRoute) || (route.indexOf(a.c.n) - route.indexOf(b.c.n)));
+  const box = $('sugg'), nextN = route.find(n => TODAY.done.indexOf(n) < 0);
+  if (picked && !q) { box.innerHTML = ''; return; }
+  if (!q && !manual && val('kind') === 'drop' && nextN) { const nc = CFG.customers.find(c => c.n === nextN); if (nc) { pick(nc, true); return; } }
+  box.innerHTML = list.slice(0, 30).map((x,i) => `<button type="button" data-i="${CFG.customers.indexOf(x.c)}" class="${x.done ? 'done' : ''}">
+    <span>${esc(x.c.s || x.c.n)}${x.c.s ? `<br><small style="color:var(--muted)">${esc(x.c.n)}</small>` : ''}${x.onRoute && x.c.dl && !x.done ? `<br><small style="color:var(--muted)">by ${esc(x.c.dl)}</small>` : ''}</span>
+    <span class="tag"${x.c.n === nextN && !q ? ' style="background:var(--leaf);color:#fff"' : ''}>${x.done ? 'done' : x.onRoute ? (x.c.n === nextN ? 'NEXT - stop ' : 'stop ') + (route.indexOf(x.c.n) + 1) : ''}</span></button>`).join('')
+    + (q ? `<button type="button" data-new="1"><span>Not in list: use "${esc($('search').value)}"</span><span class="tag">new</span></button>` : '')
+    + (!q && !list.length ? '<div style="padding:10px 12px;color:var(--muted)">Type to search all customers.</div>' : '');
+  box.querySelectorAll('button').forEach(b => b.onclick = () => pick(b.dataset.new ? { n: $('search').value.trim(), a:'', w:'', dl:'', nt:'', b:0, isNew:true } : CFG.customers[+b.dataset.i]));
+}
+function pick(c, auto){
+  picked = c; picked.auto = !!auto; $('search').value = ''; $('sugg').innerHTML = ''; $('searchWrap').classList.add('hide');
+  const card = $('custCard'); card.classList.remove('hide');
+  const done = TODAY.done.indexOf(c.n) >= 0, now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  const dl = hmOf(c.dl), late = dl != null && nowM > dl;
+  const when = dl != null ? 'Deliver before ' + ampm(dl) : (c.w ? esc(c.w) : '');
+  const pc = String(c.a || '').match(/\b(\d{6})\b/), mq = pc ? 'Singapore ' + pc[1] : (c.a || '') + ' Singapore';
+  card.innerHTML = (auto ? `<div class="kick">${ICO.find} Next on route</div>` : '')
+    + `<div class="nm">${esc(c.s || c.n)}</div>`
+    + `<div class="when${late ? ' late' : ''}">${ICO.clock} ${when}${when ? ' · ' : ''}now ${ampm(nowM)}${late ? ' · LATE' : ''}</div>`
+    + (c.a ? `<div class="ad" style="margin-top:4px">${esc(c.a)}</div>` : '')
+    + (c.a ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mq)}" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0;padding:8px 14px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:700;text-decoration:none">Open in Google Maps</a>` : '')
+    + (c.nt ? `<div class="note blue">${esc(c.nt)}</div>` : '')
+    + (c.b > 0 ? `<div class="note warn">${ICO.warn} Collect ${c.b} basket${c.b > 1 ? 's' : ''}${c.bd ? ' left from ' + esc(c.bd) : ''}</div>` : '')
+    + (done ? `<div class="note warn">Already delivered today - this is another visit</div>` : '')
+    + (c.isNew ? `<div class="note bad">New customer - supervisor will check</div>` : '')
+    + `<button type="button" id="changeCust" style="margin-top:10px;background:none;border:0;color:var(--leaf);font-weight:700;padding:0;cursor:pointer">${auto ? 'Deliver to a different customer' : 'Change customer'}</button>`;
+  $('changeCust').onclick = () => { picked = null; manual = true; card.classList.add('hide'); $('searchWrap').classList.remove('hide'); $('search').focus(); suggest(); gpsLine(); };
+  gpsLine();
+}
+function gpsLine(){
+  const el = $('gpsLine');
+  if (!picked || !picked.la || !picked.lo || !lat) { el.classList.add('hide'); return; }
+  const toR = x => x * Math.PI / 180, R = 6371000, dLa = toR(picked.la - lat), dLo = toR(picked.lo - lng);
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(toR(lat)) * Math.cos(toR(picked.la)) * Math.sin(dLo / 2) ** 2, m = Math.round(2 * R * Math.asin(Math.sqrt(h)));
+  el.innerHTML = `${ICO.pin} GPS ${m < 1000 ? m + ' m' : (m / 1000).toFixed(1) + ' km'} from customer · time auto`;
+  el.classList.remove('hide'); el.classList.toggle('far', m > 300);
+}
+$('reason').onchange = () => { document.querySelector('label[for=sg_n]').textContent = $('reason').value ? 'NO · ' + $('reason').value.toLowerCase() : 'NO'; };
+$('search').oninput = suggest;
+
+/* UI state */
+function render(){
+  const k = val('kind');
+  ['drop','ppwc','meet','start','end'].forEach(x => $('f_' + x).classList.toggle('hide', k !== x));
+  $('reasonBox').classList.toggle('hide', val('signed') !== 'No');
+  $('submitBtn').textContent = { drop: 'Submit drop', start: 'Start delivery', end: 'End delivery', ppwc: 'Submit PPWC', meet: 'Submit meet' }[k] || 'Submit';
+  if (k !== 'drop') { picked = null; $('custCard').classList.add('hide'); $('searchWrap').classList.remove('hide'); } else if (!picked) suggest();
+  if (k === 'end') $('endInfo').textContent = `Today: ${TODAY.drops} drops, incentive RM${Math.round(TODAY.amount)}.`;
+}
+document.querySelectorAll('input[name=kind],input[name=signed]').forEach(r => r.addEventListener('change', render));
+document.querySelectorAll('.step button').forEach(b => b.onclick = () => { const i = $(b.dataset.t); i.value = Math.max(0, (parseInt(i.value)||0) + (+b.dataset.d)); });
+
+/* Photos: resize + stamp */
+document.querySelectorAll('.shot').forEach(box => {
+  box.querySelector('input').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 1100 / Math.max(img.width, img.height)), w = Math.round(img.width*s), h = Math.round(img.height*s);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d'); x.drawImage(img, 0, 0, w, h);
+      const d = new Date(), fs = Math.max(16, Math.round(w/34));
+      const lines = [pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+'  '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()),
+        ($('driver').value||'') + '  |  ' + ($('truck').value||'') + '  |  ' + (picked && val('kind') === 'drop' ? (picked.s || picked.n) : val('kind').toUpperCase()),
+        lat ? 'GPS ' + lat + ', ' + lng : 'GPS not available'];
+      const bh = fs*1.35*lines.length + fs;
+      x.fillStyle = 'rgba(20,40,30,.72)'; x.fillRect(0, h-bh, w, bh);
+      x.fillStyle = '#F2B705'; x.fillRect(0, h-bh, Math.round(fs/3), bh);
+      x.fillStyle = '#fff'; x.font = `600 ${fs}px "Barlow Semi Condensed",sans-serif`;
+      lines.forEach((t,k) => x.fillText(t, fs, h-bh+fs*1.35*(k+1)+fs*0.15));
+      photos[box.dataset.p] = c.toDataURL('image/jpeg', 0.62);
+      box.querySelector('img').src = photos[box.dataset.p]; box.querySelector('img').classList.remove('hide'); box.querySelector('.hint').classList.add('hide');
+    };
+    img.src = URL.createObjectURL(f);
+  };
+});
+
+/* Offline queue */
+function queue(){ return store.get('sg_queue', []); }
+function qPill(){ const n = queue().length; $('queue').classList.toggle('hide', !n); $('queue').className = 'pill warn' + (n ? '' : ' hide'); $('queue').textContent = n + ' waiting to send'; }
+async function flush(){
+  if (sending || !navigator.onLine) return; sending = true;
+  try {
+    let q = queue();
+    while (q.length) {
+      const item = q[0];
+      const r = await fetch(API, { method:'POST', body: JSON.stringify(item) });
+      const j = await r.json();
+      if (!j.ok) { msg('Not accepted: ' + j.error + ' (removed from queue)', true); }
+      else if (j.today && item.driver === $('driver').value) showToday(j.today);
+      q = queue(); q.shift(); store.set('sg_queue', q); qPill();
+    }
+  } catch(e) { /* keep for later */ }
+  sending = false; qPill();
+}
+setInterval(flush, 30000); qPill(); flush();
+
+/* Submit */
+function msg(t, err){ $('msg').textContent = t; $('msg').className = 'msg' + (err ? ' err' : t ? ' ok' : ''); }
+$('submitBtn').onclick = async () => {
+  const k = val('kind'), drv = $('driver').value;
+  const d = { kind:k, driver:drv, truck:$('truck').value, trip:val('trip'), remarks:$('remarks').value.trim(),
+              cid: Date.now().toString(36) + Math.random().toString(36).slice(2,8), ts: Date.now() };
+  const miss = [!drv && 'driver', !d.truck && 'truck'];
+  if (k === 'drop') {
+    Object.assign(d, { customer: picked ? picked.n : '', pod: photos.pod, inv: photos.inv, signed: val('signed'), reason: $('reason').value,
+      bOut: $('bOut').value, bIn: $('bIn').value });
+    miss.push(!picked && 'customer', !d.pod && 'POD photo', !d.inv && 'invoice photo', !d.signed && 'invoice signed YES/NO', d.signed === 'No' && !d.reason && 'reason not signed');
+  } else if (k === 'ppwc') {
+    d.suppliers = [...document.querySelectorAll('#suppliers input:checked')].map(i => i.value); d.pod = photos.pod2;
+    miss.push(!d.suppliers.length && 'supplier', !d.pod && 'photo of items');
+  } else if (k === 'meet') { d.met = $('met').value; d.pod = photos.pod3 || ''; miss.push(!d.met && 'driver met'); }
+  else if (k === 'start') { d.temp = $('temp').value; d.pod = photos.pod4 || ''; miss.push(d.temp === '' && 'temperature'); }
+  else if (k === 'end') { d.bIn = $('bBack').value; }
+  const m = miss.filter(Boolean);
+  if (m.length) return msg('Fill in: ' + m.join(', '), true);
+  $('submitBtn').disabled = true; msg('Saving...');
+  await getLoc(); d.lat = lat; d.lng = lng;
+  const q = queue(); q.push(d);
+  if (!store.set('sg_queue', q)) { $('submitBtn').disabled = false; return msg('Phone storage full - wait for signal, then submit again.', true); }
+  qPill();
+  // optimistic update
+  if (k === 'drop') { TODAY.done.push(d.customer); TODAY.drops = (TODAY.drops || 0) + 1; updateHead(); }
+  if (k === 'ppwc') { $('tr2').checked = true; store.set('sg_trip', { date: new Date().toDateString(), t: '2' }); }
+  resetForm(k);
+  $('submitBtn').disabled = false;
+  msg(navigator.onLine ? 'Sent - ' + labelOf(d) : 'Saved on phone - will send when signal returns', !navigator.onLine && false);
+  flush();
+};
+function labelOf(d){ return d.kind === 'drop' ? d.customer : d.kind.toUpperCase(); }
+function resetForm(k){
+  photos = {}; picked = null; manual = false; $('custCard').classList.add('hide'); $('searchWrap').classList.remove('hide'); $('search').value = ''; $('gpsLine').classList.add('hide');
+  document.querySelector('label[for=sg_n]').textContent = 'NO';
+  ['bOut','bIn','bBack'].forEach(id => $(id).value = 0); ['remarks','temp'].forEach(id => $(id).value = '');
+  document.querySelectorAll('input[name=signed]').forEach(r => r.checked = false); $('reason').value = '';
+  document.querySelectorAll('#suppliers input').forEach(i => i.checked = false); $('met').value = '';
+  document.querySelectorAll('.shot').forEach(b => { b.querySelector('input').value = ''; b.querySelector('img').classList.add('hide'); b.querySelector('.hint').classList.remove('hide'); });
+  if (k !== 'drop') $('k_drop').checked = true;
+  render(); suggest(); window.scrollTo(0,0);
+}
+
+if (CFG) fill();
+render(); loadCfg();
+</script>
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
+</body>
+</html>
