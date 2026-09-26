@@ -337,7 +337,7 @@ function pick(c, auto){
     + `<div class="nm">${esc(c.s || c.n)}</div>`
     + `<div class="when${late ? ' late' : ''}">${ICO.clock} ${when}${when ? ' · ' : ''}now ${ampm(nowM)}${late ? ' · LATE' : ''}</div>`
     + (c.a ? `<div class="ad" style="margin-top:4px">${esc(c.a)}</div>` : '')
-    + (c.a || c.la ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mq)}" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0;padding:8px 14px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:700;text-decoration:none">Open in Google Maps</a>` : '')
+    + (c.a || c.la ? `<a href="${c.la && c.lo ? 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(c.la + ',' + c.lo) : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mq)}" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0;padding:8px 14px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:700;text-decoration:none">Open in Google Maps</a>` : '')
     + (c.nt ? `<div class="note blue">${esc(c.nt)}</div>` : '')
     + (c.b > 0 ? `<div class="note warn">${ICO.warn} Collect ${c.b} basket${c.b > 1 ? 's' : ''}${c.bd ? ' left from ' + esc(c.bd) : ''}</div>` : '')
     + (done ? `<div class="note warn">Already delivered today - this is another visit</div>` : '')
