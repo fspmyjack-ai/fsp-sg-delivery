@@ -100,6 +100,12 @@
   .btile button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--leaf);background:#fff;color:var(--leaf);font:700 22px/1 "Barlow Semi Condensed";cursor:pointer}
   .logo{display:block;height:24px;width:auto;max-width:62vw;margin-bottom:4px}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .pgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:64px;gap:8px}
+  .pgrid .shot{min-height:0;height:100%;padding:2px}
+  .pgrid .big{grid-column:span 2;grid-row:span 2}
+  .pgrid .sm{font-size:22px;line-height:1}
+  .pgrid .sm small{font-size:11px}
+  .pgrid .shot img{width:100%;height:100%;object-fit:cover}
   .hide{display:none!important}
 </style>
 </head>
@@ -149,10 +155,10 @@
       <div id="custCard" class="card hide"></div>
     </section>
     <section>
-      <div class="shots">
-        <div class="shot" data-p="pod"><span class="hint">POD photo<small>required</small></span><img class="hide" alt="POD photo"><input type="file" accept="image/*" capture="environment" aria-label="POD photo"></div>
-        <div class="shot" data-p="inv"><span class="hint">Invoice photo<small>required</small></span><img class="hide" alt="Invoice photo"><input type="file" accept="image/*" capture="environment" aria-label="Invoice photo"></div>
-      </div>
+      <label style="margin-top:0">POD photos <small>(1st required, up to 4 extra)</small></label>
+      <div class="pgrid"><div class="shot big" data-p="pod"><span class="hint">POD photo<small>required</small></span><img class="hide" alt="POD photo"><input type="file" accept="image/*" capture="environment" aria-label="POD photo"></div><div class="shot sm opt" data-p="podx2"><span class="hint">+<small>extra</small></span><img class="hide" alt="POD photo 2"><input type="file" accept="image/*" capture="environment" aria-label="POD photo 2"></div><div class="shot sm opt" data-p="podx3"><span class="hint">+<small>extra</small></span><img class="hide" alt="POD photo 3"><input type="file" accept="image/*" capture="environment" aria-label="POD photo 3"></div><div class="shot sm opt" data-p="podx4"><span class="hint">+<small>extra</small></span><img class="hide" alt="POD photo 4"><input type="file" accept="image/*" capture="environment" aria-label="POD photo 4"></div><div class="shot sm opt" data-p="podx5"><span class="hint">+<small>extra</small></span><img class="hide" alt="POD photo 5"><input type="file" accept="image/*" capture="environment" aria-label="POD photo 5"></div></div>
+      <label>Invoice photos <small>(1st required, up to 3 extra)</small></label>
+      <div class="pgrid"><div class="shot big" data-p="inv"><span class="hint">Invoice photo<small>required</small></span><img class="hide" alt="Invoice photo"><input type="file" accept="image/*" capture="environment" aria-label="Invoice photo"></div><div class="shot sm opt" data-p="invx2"><span class="hint">+<small>extra</small></span><img class="hide" alt="Invoice photo 2"><input type="file" accept="image/*" capture="environment" aria-label="Invoice photo 2"></div><div class="shot sm opt" data-p="invx3"><span class="hint">+<small>extra</small></span><img class="hide" alt="Invoice photo 3"><input type="file" accept="image/*" capture="environment" aria-label="Invoice photo 3"></div><div class="shot sm opt" data-p="invx4"><span class="hint">+<small>extra</small></span><img class="hide" alt="Invoice photo 4"><input type="file" accept="image/*" capture="environment" aria-label="Invoice photo 4"></div></div>
       <label>Invoice signed?</label>
       <div class="seg c2 yn"><input type="radio" name="signed" id="sg_y" value="Yes"><label for="sg_y">Yes</label>
         <input type="radio" name="signed" id="sg_n" value="No"><label for="sg_n">No</label></div>
@@ -439,6 +445,8 @@ $('submitBtn').onclick = async () => {
               cid: Date.now().toString(36) + Math.random().toString(36).slice(2,8), ts: Date.now() };
   const miss = [!drv && 'driver', !d.truck && 'truck'];
   if (k === 'drop') {
+    d.podx = ['podx2', 'podx3', 'podx4', 'podx5'].map(k => photos[k]).filter(Boolean);
+    d.invx = ['invx2', 'invx3', 'invx4'].map(k => photos[k]).filter(Boolean);
     Object.assign(d, { customer: picked ? picked.n : '', pod: photos.pod, inv: photos.inv, signed: val('signed'), reason: $('reason').value,
       bOut: $('bOut').value, bIn: $('bIn').value });
     miss.push(!picked && 'customer', !d.pod && 'POD photo', !d.inv && 'invoice photo', !d.signed && 'invoice signed YES/NO', d.signed === 'No' && !d.reason && 'reason not signed');
