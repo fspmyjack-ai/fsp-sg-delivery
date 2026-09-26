@@ -45,6 +45,7 @@
   .stat b{display:block;font:700 24px/1.1 "Barlow Semi Condensed",sans-serif;color:var(--leaf)}
   .stat span{font-size:12px;color:var(--muted)}
   .sugg{border:1.5px solid var(--line);border-radius:8px;background:#fff;margin-top:4px;max-height:320px;overflow:auto}
+  .sugg:empty{display:none}
   .sugg button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;padding:11px 12px;border:0;border-bottom:1px solid #E6EAE5;background:none;font:inherit;cursor:pointer}
   .sugg button:last-child{border-bottom:0}
   .sugg .tag{font-size:12px;padding:1px 6px;border-radius:99px;background:var(--okbg);color:var(--leaf);white-space:nowrap}
@@ -72,6 +73,31 @@
   .btn:disabled{opacity:.5}
   .msg{max-width:560px;margin:0 auto 6px;font-weight:600;font-size:15px}
   .msg.err{color:var(--bad)}.msg.ok{color:var(--leaf)}
+  .hcard{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}
+  .hc-sm{font-size:14px;color:var(--muted)}
+  .hc-big{font:700 28px/1.1 "Barlow Semi Condensed",sans-serif;color:var(--ink)}
+  .hc-mid{font:700 21px/1.1 "Barlow Semi Condensed",sans-serif;color:var(--ink);white-space:nowrap}
+  .hc-r{text-align:right}
+  .kick{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+  .kick svg{flex:none}
+  .when{display:flex;align-items:center;gap:6px;font-size:15px;color:var(--muted);margin-top:2px}
+  .when.late{color:var(--bad);font-weight:700}
+  .note.blue{background:#DCEBFA;color:#1F4E8C;font-weight:500}
+  .note.warn{color:#6B4E00}
+  .gpsl{margin-top:12px}.gpsl.far{color:var(--bad);font-weight:700}
+  .hcard .hc-sm{white-space:nowrap}
+  .hcard .chg{background:none;border:0;padding:0;margin-left:6px;color:var(--leaf);font:600 13px Barlow,sans-serif;cursor:pointer;text-decoration:underline}
+  #kinds.seg label{padding:9px 2px;font-size:13px;border-radius:99px}
+  #kinds{margin-top:4px}
+  .seg.yn label{padding:20px 4px;font-size:19px;border-radius:12px}
+  .seg.yn input[value=Yes]:checked+label{background:var(--okbg);border-color:var(--leaf);color:var(--leaf)}
+  .seg.yn input[value=No]:checked+label{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+  .btile{background:#EEF1EC;border-radius:12px;padding:10px 12px}
+  .btile .bl{font-size:14px;color:var(--muted)}
+  .btile .bv{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:4px;margin-top:4px}
+  .btile input::-webkit-outer-spin-button,.btile input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .btile input{-moz-appearance:textfield;border:0;background:none;padding:0;width:100%;text-align:center;font:700 32px/1.1 "Barlow Semi Condensed",sans-serif;color:var(--ink)}
+  .btile button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--leaf);background:#fff;color:var(--leaf);font:700 22px/1 "Barlow Semi Condensed";cursor:pointer}
   .hide{display:none!important}
 </style>
 </head>
@@ -85,7 +111,13 @@
 </header>
 
 <main>
-  <section>
+  <section id="statsSec" class="hide" style="border-bottom:0;padding-bottom:0">
+    <div class="hcard">
+      <div><div class="hc-sm"><span id="hTruck"></span><button type="button" class="chg" id="chgSetup">change</button></div><div class="hc-big" id="hDrop">Drop 1</div></div>
+      <div class="hc-r"><div class="hc-sm" id="hTrip">Today</div><div class="hc-mid" id="hToday">0 drops · RM0</div></div>
+    </div>
+  </section>
+  <section id="setup">
     <div class="row">
       <div><label for="driver">Driver</label><select id="driver"></select></div>
       <div><label for="truck">Truck</label><select id="truck"></select></div>
@@ -95,13 +127,6 @@
       <input type="radio" name="trip" id="tr2" value="2"><label for="tr2">Trip 2</label></div>
   </section>
 
-  <section id="statsSec" class="hide">
-    <div class="stats">
-      <div class="stat"><b id="sDrops">0</b><span>drops today</span></div>
-      <div class="stat"><b id="sLeft">-</b><span>left on list</span></div>
-      <div class="stat"><b id="sAmt">RM0</b><span>incentive today</span></div>
-    </div>
-  </section>
 
   <section>
     <div class="seg c5" id="kinds">
@@ -116,8 +141,8 @@
   <!-- DROP -->
   <div id="f_drop">
     <section>
-      <label for="search">Customer <small>(type a few letters)</small></label>
-      <input id="search" autocomplete="off" placeholder="e.g. chimi, sarnies">
+      <div id="searchWrap"><label for="search">Customer <small>(type a few letters)</small></label>
+      <input id="search" autocomplete="off" placeholder="e.g. chimi, sarnies"></div>
       <div class="sugg" id="sugg"></div>
       <div id="custCard" class="card hide"></div>
     </section>
@@ -126,16 +151,17 @@
         <div class="shot" data-p="pod"><span class="hint">POD photo<small>required</small></span><img class="hide" alt="POD photo"><input type="file" accept="image/*" capture="environment" aria-label="POD photo"></div>
         <div class="shot" data-p="inv"><span class="hint">Invoice photo<small>required</small></span><img class="hide" alt="Invoice photo"><input type="file" accept="image/*" capture="environment" aria-label="Invoice photo"></div>
       </div>
-      <label>Invoice signed by chef?</label>
-      <div class="seg c2 yn"><input type="radio" name="signed" id="sg_y" value="Yes"><label for="sg_y">YES</label>
-        <input type="radio" name="signed" id="sg_n" value="No"><label for="sg_n">NO</label></div>
+      <label>Invoice signed?</label>
+      <div class="seg c2 yn"><input type="radio" name="signed" id="sg_y" value="Yes"><label for="sg_y">Yes</label>
+        <input type="radio" name="signed" id="sg_n" value="No"><label for="sg_n">No</label></div>
       <div id="reasonBox" class="hide"><label for="reason">Why not signed?</label><select id="reason"></select></div>
     </section>
     <section>
       <div class="row">
-        <div><label>Baskets delivered</label><div class="step"><button type="button" data-t="bOut" data-d="-1" aria-label="Less">-</button><input id="bOut" type="number" inputmode="numeric" value="0" min="0"><button type="button" data-t="bOut" data-d="1" aria-label="More">+</button></div></div>
-        <div><label>Baskets collected</label><div class="step"><button type="button" data-t="bIn" data-d="-1" aria-label="Less">-</button><input id="bIn" type="number" inputmode="numeric" value="0" min="0"><button type="button" data-t="bIn" data-d="1" aria-label="More">+</button></div></div>
+        <div class="btile"><div class="bl">Baskets delivered</div><div class="bv step2"><button type="button" data-t="bOut" data-d="-1" aria-label="Less">−</button><input id="bOut" type="number" inputmode="numeric" value="0" min="0" aria-label="Baskets delivered"><button type="button" data-t="bOut" data-d="1" aria-label="More">+</button></div></div>
+        <div class="btile"><div class="bl">Baskets collected</div><div class="bv step2"><button type="button" data-t="bIn" data-d="-1" aria-label="Less">−</button><input id="bIn" type="number" inputmode="numeric" value="0" min="0" aria-label="Baskets collected"><button type="button" data-t="bIn" data-d="1" aria-label="More">+</button></div></div>
       </div>
+      <div class="kick gpsl hide" id="gpsLine"></div>
     </section>
   </div>
 
@@ -214,7 +240,7 @@ window.addEventListener('online', () => { netPill(); flush(); }); window.addEven
 /* GPS */
 function getLoc(){ return new Promise(res => {
   if (!navigator.geolocation) { $('gps').textContent = 'No GPS'; return res(); }
-  navigator.geolocation.getCurrentPosition(p => { lat = p.coords.latitude.toFixed(6); lng = p.coords.longitude.toFixed(6); $('gps').textContent = 'GPS ok'; $('gps').className = 'pill'; res(); },
+  navigator.geolocation.getCurrentPosition(p => { lat = p.coords.latitude.toFixed(6); lng = p.coords.longitude.toFixed(6); $('gps').textContent = 'GPS ok'; $('gps').className = 'pill'; gpsLine(); res(); },
     () => { $('gps').textContent = 'GPS off - allow location'; $('gps').className = 'pill warn'; res(); },
     { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); }); }
 getLoc(); setInterval(getLoc, 60000);
@@ -227,7 +253,12 @@ async function loadCfg(){
     const j = await r.json(); if (!j.ok) throw new Error(j.error);
     CFG = j; store.set('sg_cfg', j); fill(); if (j.today) showToday(j.today);
     if (j.routes && j.routes._error) msg('Route list: ' + j.routes._error, true);
-  } catch(e) { if (!CFG) msg('Cannot load data - check signal.', true); else fill(); }
+  } catch(e) {
+    if (!CFG) return msg('No signal - open the app once with signal to load today\'s list.', true);
+    fill();
+    const d = new Date(), t = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    msg(CFG.date === t ? 'Offline - using today\'s saved list' : 'Offline - list is from ' + CFG.date + '. Open with signal to get today\'s route.', CFG.date !== t);
+  }
 }
 function opts(arr, ph){ return (ph ? `<option value="">${ph}</option>` : '') + arr.map(x => `<option>${esc(x)}</option>`).join(''); }
 function fill(){
@@ -237,23 +268,45 @@ function fill(){
   $('met').innerHTML = opts(CFG.drivers.map(d => d.name).filter(n => n !== dSel), 'Choose driver');
   $('reason').innerHTML = opts(CFG.reasons, 'Choose reason');
   $('suppliers').innerHTML = CFG.suppliers.map((s,i) => `<input type="checkbox" id="sp${i}" value="${esc(s)}"><label for="sp${i}">${esc(s)}</label>`).join('');
-  suggest();
+  updateHead(); suggest();
 }
 $('driver').onchange = () => { const d = CFG.drivers.find(x => x.name === $('driver').value);
   if (d && d.truck) $('truck').value = d.truck; store.set('sg_driver', $('driver').value); store.set('sg_truck', $('truck').value); fill(); loadCfg(); };
-$('truck').onchange = () => { store.set('sg_truck', $('truck').value); suggest(); };
+$('truck').onchange = () => { store.set('sg_truck', $('truck').value); picked = null; $('custCard').classList.add('hide'); updateHead(); suggest(); };
 const tripSaved = store.get('sg_trip', null);
 if (tripSaved && tripSaved.date === new Date().toDateString()) $('tr' + tripSaved.t).checked = true;
-document.querySelectorAll('input[name=trip]').forEach(r => r.onchange = () => store.set('sg_trip', { date: new Date().toDateString(), t: val('trip') }));
+document.querySelectorAll('input[name=trip]').forEach(r => r.onchange = () => { store.set('sg_trip', { date: new Date().toDateString(), t: val('trip') }); updateHead(); });
 
 let TODAY = { done: [], drops: 0, amount: 0 };
 function showToday(t){
-  TODAY = t; $('statsSec').classList.remove('hide');
-  $('sDrops').textContent = t.drops; $('sAmt').textContent = 'RM' + Math.round(t.amount);
-  const route = (CFG.routes || {})[$('truck').value] || [];
-  $('sLeft').textContent = route.length ? route.filter(n => t.done.indexOf(n) < 0).length : '-';
-  suggest();
+  TODAY = t;
+  if (picked && picked.auto && TODAY.done.indexOf(picked.n) >= 0) { picked = null; $('custCard').classList.add('hide'); }
+  updateHead(); suggest();
 }
+function setupView(open){
+  const ok = $('driver').value && $('truck').value;
+  $('setup').classList.toggle('hide', !open && !!ok);
+}
+function updateHead(){
+  if (!CFG) return;
+  setupView(false);
+  const route = (CFG.routes || {})[$('truck').value] || [], doneOn = route.filter(n => TODAY.done.indexOf(n) >= 0).length;
+  $('statsSec').classList.remove('hide');
+  $('hTruck').textContent = [$('truck').value, $('driver').value].filter(String).join(' · '); $('hTrip').textContent = 'Trip ' + val('trip') + ' · Today';
+  $('hDrop').textContent = route.length ? (doneOn >= route.length ? 'All ' + route.length + ' stops done' : 'Drop ' + (doneOn + 1) + ' of ' + route.length)
+    : 'Drop ' + ((TODAY.drops || 0) + 1);
+  $('hToday').textContent = (TODAY.drops || 0) + ' drop' + (TODAY.drops === 1 ? '' : 's') + ' · RM' + Math.round(TODAY.amount || 0);
+}
+const ICO = {
+  find: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  clock: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  pin: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  warn: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></svg>'
+};
+function hmOf(t){ const m = String(t || '').match(/(\d{1,2})[:.](\d{2})/); return m ? +m[1] * 60 + +m[2] : null; }
+function ampm(m){ if (m == null) return ''; const h = Math.floor(m / 60), mm = pad(m % 60); return (h % 12 || 12) + '.' + mm + (h < 12 ? 'am' : 'pm'); }
+let manual = false;
+$('chgSetup').onclick = () => { setupView(true); $('setup').scrollIntoView({ behavior: 'smooth' }); };
 
 /* Customer search */
 function suggest(){
@@ -265,6 +318,7 @@ function suggest(){
   list.sort((a,b) => (a.done - b.done) || (b.onRoute - a.onRoute) || (route.indexOf(a.c.n) - route.indexOf(b.c.n)));
   const box = $('sugg'), nextN = route.find(n => TODAY.done.indexOf(n) < 0);
   if (picked && !q) { box.innerHTML = ''; return; }
+  if (!q && !manual && val('kind') === 'drop' && nextN) { const nc = CFG.customers.find(c => c.n === nextN); if (nc) { pick(nc, true); return; } }
   box.innerHTML = list.slice(0, 30).map((x,i) => `<button type="button" data-i="${CFG.customers.indexOf(x.c)}" class="${x.done ? 'done' : ''}">
     <span>${esc(x.c.s || x.c.n)}${x.c.s ? `<br><small style="color:var(--muted)">${esc(x.c.n)}</small>` : ''}${x.onRoute && x.c.dl && !x.done ? `<br><small style="color:var(--muted)">by ${esc(x.c.dl)}</small>` : ''}</span>
     <span class="tag"${x.c.n === nextN && !q ? ' style="background:var(--leaf);color:#fff"' : ''}>${x.done ? 'done' : x.onRoute ? (x.c.n === nextN ? 'NEXT - stop ' : 'stop ') + (route.indexOf(x.c.n) + 1) : ''}</span></button>`).join('')
@@ -272,21 +326,35 @@ function suggest(){
     + (!q && !list.length ? '<div style="padding:10px 12px;color:var(--muted)">Type to search all customers.</div>' : '');
   box.querySelectorAll('button').forEach(b => b.onclick = () => pick(b.dataset.new ? { n: $('search').value.trim(), a:'', w:'', dl:'', nt:'', b:0, isNew:true } : CFG.customers[+b.dataset.i]));
 }
-function pick(c){
-  picked = c; $('search').value = ''; $('sugg').innerHTML = '';
+function pick(c, auto){
+  picked = c; picked.auto = !!auto; $('search').value = ''; $('sugg').innerHTML = ''; $('searchWrap').classList.add('hide');
   const card = $('custCard'); card.classList.remove('hide');
-  const done = TODAY.done.indexOf(c.n) >= 0;
-  const pc = String(c.a || '').match(/\b(\d{6})\b/), mq = pc ? 'Singapore ' + pc[1] : (c.a || '') + ' Singapore';
-  card.innerHTML = `<div class="nm">${esc(c.s || c.n)}</div><div class="ad">${esc(c.a || '')}</div>`
-    + (c.a ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mq)}" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0;padding:8px 14px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:700;text-decoration:none">Open in Google Maps</a>` : '')
-    + (c.w || c.dl ? `<div class="note info">Delivery: ${esc(c.w || '')}${c.dl ? ' (deadline ' + esc(c.dl) + ')' : ''}</div>` : '')
-    + (c.nt ? `<div class="note info">${esc(c.nt)}</div>` : '')
-    + (c.b > 0 ? `<div class="note warn">Customer is holding ${c.b} basket${c.b > 1 ? 's' : ''} - collect back</div>` : '')
+  const done = TODAY.done.indexOf(c.n) >= 0, now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  const dl = hmOf(c.dl), late = dl != null && nowM > dl;
+  const when = dl != null ? 'Deliver before ' + ampm(dl) : (c.w ? esc(c.w) : '');
+  const pc = String(c.a || '').match(/\b(\d{6})\b/), mq = c.la && c.lo ? c.la + ',' + c.lo : pc ? 'Singapore ' + pc[1] : (c.a || '') + ' Singapore';
+  card.innerHTML = (auto ? `<div class="kick">${ICO.find} Next on route</div>` : '')
+    + `<div class="nm">${esc(c.s || c.n)}</div>`
+    + `<div class="when${late ? ' late' : ''}">${ICO.clock} ${when}${when ? ' · ' : ''}now ${ampm(nowM)}${late ? ' · LATE' : ''}</div>`
+    + (c.a ? `<div class="ad" style="margin-top:4px">${esc(c.a)}</div>` : '')
+    + (c.a || c.la ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mq)}" target="_blank" rel="noopener" style="display:inline-block;margin:6px 0 0;padding:8px 14px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:700;text-decoration:none">Open in Google Maps</a>` : '')
+    + (c.nt ? `<div class="note blue">${esc(c.nt)}</div>` : '')
+    + (c.b > 0 ? `<div class="note warn">${ICO.warn} Collect ${c.b} basket${c.b > 1 ? 's' : ''}${c.bd ? ' left from ' + esc(c.bd) : ''}</div>` : '')
     + (done ? `<div class="note warn">Already delivered today - this is another visit</div>` : '')
     + (c.isNew ? `<div class="note bad">New customer - supervisor will check</div>` : '')
-    + `<button type="button" id="changeCust" style="margin-top:8px;background:none;border:0;color:var(--leaf);font-weight:700;padding:0;cursor:pointer">Change customer</button>`;
-  $('changeCust').onclick = () => { picked = null; card.classList.add('hide'); $('search').focus(); suggest(); };
+    + `<button type="button" id="changeCust" style="margin-top:10px;background:none;border:0;color:var(--leaf);font-weight:700;padding:0;cursor:pointer">${auto ? 'Deliver to a different customer' : 'Change customer'}</button>`;
+  $('changeCust').onclick = () => { picked = null; manual = true; card.classList.add('hide'); $('searchWrap').classList.remove('hide'); $('search').focus(); suggest(); gpsLine(); };
+  gpsLine();
 }
+function gpsLine(){
+  const el = $('gpsLine');
+  if (!picked || !picked.la || !picked.lo || !lat) { el.classList.add('hide'); return; }
+  const toR = x => x * Math.PI / 180, R = 6371000, dLa = toR(picked.la - lat), dLo = toR(picked.lo - lng);
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(toR(lat)) * Math.cos(toR(picked.la)) * Math.sin(dLo / 2) ** 2, m = Math.round(2 * R * Math.asin(Math.sqrt(h)));
+  el.innerHTML = `${ICO.pin} GPS ${m < 1000 ? m + ' m' : (m / 1000).toFixed(1) + ' km'} from customer · time auto`;
+  el.classList.remove('hide'); el.classList.toggle('far', m > 300);
+}
+$('reason').onchange = () => { document.querySelector('label[for=sg_n]').textContent = $('reason').value ? 'No · ' + $('reason').value.toLowerCase() : 'No'; };
 $('search').oninput = suggest;
 
 /* UI state */
@@ -294,10 +362,12 @@ function render(){
   const k = val('kind');
   ['drop','ppwc','meet','start','end'].forEach(x => $('f_' + x).classList.toggle('hide', k !== x));
   $('reasonBox').classList.toggle('hide', val('signed') !== 'No');
+  $('submitBtn').textContent = { drop: 'Submit drop', start: 'Start delivery', end: 'End delivery', ppwc: 'Submit PPWC', meet: 'Submit meet' }[k] || 'Submit';
+  if (k !== 'drop') { picked = null; $('custCard').classList.add('hide'); $('searchWrap').classList.remove('hide'); } else if (!picked) suggest();
   if (k === 'end') $('endInfo').textContent = `Today: ${TODAY.drops} drops, incentive RM${Math.round(TODAY.amount)}.`;
 }
 document.querySelectorAll('input[name=kind],input[name=signed]').forEach(r => r.addEventListener('change', render));
-document.querySelectorAll('.step button').forEach(b => b.onclick = () => { const i = $(b.dataset.t); i.value = Math.max(0, (parseInt(i.value)||0) + (+b.dataset.d)); });
+document.querySelectorAll('.step button,.step2 button').forEach(b => b.onclick = () => { const i = $(b.dataset.t); i.value = Math.max(0, (parseInt(i.value)||0) + (+b.dataset.d)); });
 
 /* Photos: resize + stamp */
 document.querySelectorAll('.shot').forEach(box => {
@@ -324,25 +394,40 @@ document.querySelectorAll('.shot').forEach(box => {
   };
 });
 
-/* Offline queue */
-function queue(){ return store.get('sg_queue', []); }
+/* Offline queue - kept in IndexedDB (room for hundreds of drops with photos), old localStorage queue moved over */
+const IDB = { db: null,
+  open(){ return new Promise(res => { try { const r = indexedDB.open('fspsg', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onsuccess = () => { IDB.db = r.result; res(); }; r.onerror = () => res(); } catch(e) { res(); } }); },
+  get(k){ return new Promise(res => { if (!IDB.db) return res(null); try { const q = IDB.db.transaction('kv').objectStore('kv').get(k);
+    q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch(e) { res(null); } }); },
+  set(k, v){ return new Promise(res => { if (!IDB.db) return res(false); try { const tx = IDB.db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k);
+    tx.oncomplete = () => res(true); tx.onerror = () => res(false); tx.onabort = () => res(false); } catch(e) { res(false); } }); } };
+let Q = [];
+async function qSave(){ if (await IDB.set('queue', Q)) return true; return store.set('sg_queue', Q); }
+async function qLoad(){
+  await IDB.open();
+  const saved = await IDB.get('queue'), old = store.get('sg_queue', []);
+  Q = (saved || []).concat(IDB.db ? old : []); if (!IDB.db) Q = old;
+  if (IDB.db && old.length && await qSave()) { try { localStorage.removeItem('sg_queue'); } catch(e) {} }
+  qPill();
+}
+function queue(){ return Q; }
 function qPill(){ const n = queue().length; $('queue').classList.toggle('hide', !n); $('queue').className = 'pill warn' + (n ? '' : ' hide'); $('queue').textContent = n + ' waiting to send'; }
 async function flush(){
   if (sending || !navigator.onLine) return; sending = true;
   try {
-    let q = queue();
-    while (q.length) {
-      const item = q[0];
+    while (Q.length) {
+      const item = Q[0];
       const r = await fetch(API, { method:'POST', body: JSON.stringify(item) });
       const j = await r.json();
       if (!j.ok) { msg('Not accepted: ' + j.error + ' (removed from queue)', true); }
       else if (j.today && item.driver === $('driver').value) showToday(j.today);
-      q = queue(); q.shift(); store.set('sg_queue', q); qPill();
+      Q.shift(); await qSave(); qPill();
     }
   } catch(e) { /* keep for later */ }
   sending = false; qPill();
 }
-setInterval(flush, 30000); qPill(); flush();
+setInterval(flush, 30000); qLoad().then(flush);
 
 /* Submit */
 function msg(t, err){ $('msg').textContent = t; $('msg').className = 'msg' + (err ? ' err' : t ? ' ok' : ''); }
@@ -365,11 +450,11 @@ $('submitBtn').onclick = async () => {
   if (m.length) return msg('Fill in: ' + m.join(', '), true);
   $('submitBtn').disabled = true; msg('Saving...');
   await getLoc(); d.lat = lat; d.lng = lng;
-  const q = queue(); q.push(d);
-  if (!store.set('sg_queue', q)) { $('submitBtn').disabled = false; return msg('Phone storage full - wait for signal, then submit again.', true); }
+  Q.push(d);
+  if (!(await qSave())) { Q.pop(); $('submitBtn').disabled = false; return msg('Phone storage full - wait for signal, then submit again.', true); }
   qPill();
   // optimistic update
-  if (k === 'drop') { TODAY.done.push(d.customer); }
+  if (k === 'drop') { TODAY.done.push(d.customer); TODAY.drops = (TODAY.drops || 0) + 1; updateHead(); }
   if (k === 'ppwc') { $('tr2').checked = true; store.set('sg_trip', { date: new Date().toDateString(), t: '2' }); }
   resetForm(k);
   $('submitBtn').disabled = false;
@@ -378,7 +463,8 @@ $('submitBtn').onclick = async () => {
 };
 function labelOf(d){ return d.kind === 'drop' ? d.customer : d.kind.toUpperCase(); }
 function resetForm(k){
-  photos = {}; picked = null; $('custCard').classList.add('hide'); $('search').value = '';
+  photos = {}; picked = null; manual = false; $('custCard').classList.add('hide'); $('searchWrap').classList.remove('hide'); $('search').value = ''; $('gpsLine').classList.add('hide');
+  document.querySelector('label[for=sg_n]').textContent = 'No';
   ['bOut','bIn','bBack'].forEach(id => $(id).value = 0); ['remarks','temp'].forEach(id => $(id).value = '');
   document.querySelectorAll('input[name=signed]').forEach(r => r.checked = false); $('reason').value = '';
   document.querySelectorAll('#suppliers input').forEach(i => i.checked = false); $('met').value = '';
